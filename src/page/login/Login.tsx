@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useDataBase } from "../../hook/useDataBase";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "../../utils/constant";
 import { LoginForm } from "../../utils/interface";
+import { useDatabaseContext } from "../../context/data.service";
 
 export const Login: React.FC = () => {
   const {
@@ -12,7 +12,7 @@ export const Login: React.FC = () => {
     formState: { errors },
   } = useForm<LoginForm>({});
   
-  const {loginUser,getCurrentUser} = useDataBase()
+  const {loginUser,getCurrentUser} = useDatabaseContext()
   const navigate = useNavigate();
   const [error,setError] = useState<string>('');
 
@@ -21,7 +21,7 @@ export const Login: React.FC = () => {
     if(user){
         navigate('/dashboard');
     }
-  })
+  },[])
 
   const onSubmit: SubmitHandler<LoginForm> = (data): number => {
     const response = loginUser(data);
@@ -29,6 +29,7 @@ export const Login: React.FC = () => {
       setError(response.message);
       return 0;
     }
+    localStorage.setItem("crossword_logged_in","true");
     navigate("/dashboard");
     return 0;
   };

@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import { ValidateLogin } from "../../component/validate-login/ValidateLogin";
 
 export const Dashboard: React.FC = () => {
   return (
     <>
-        <div>Dashboard</div>
+    <ValidateLogin>
+      <div>Dashboard</div>
+    </ValidateLogin>
     </>
-  )
-}
+  );
+};
