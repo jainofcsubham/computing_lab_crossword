@@ -1,9 +1,9 @@
 import React from 'react'
 
-export const Dashboard = () => {
+export const Dashboard: React.FC = () => {
   return (
-    <React.Fragment>
+    <>
         <div>Dashboard</div>
-    </React.Fragment>
+    </>
   )
 }

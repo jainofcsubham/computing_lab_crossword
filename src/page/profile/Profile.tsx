@@ -1,10 +1,10 @@
 import React from 'react'
 
-export const Profile = () => {
+export const Profile: React.FC = () => {
   return (
-    <React.Fragment>
+    <>
         <div>Profile</div>
-    </React.Fragment>
+    </>
   )
 }
 

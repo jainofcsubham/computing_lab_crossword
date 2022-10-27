@@ -1,9 +1,9 @@
 import React from 'react'
 
-export const Crossword = () => {
+export const Crossword : React.FC = () => {
   return (
-    <React.Fragment>
+    <>
         <div>Crossword</div>
-    </React.Fragment>
+    </>
   )
 }

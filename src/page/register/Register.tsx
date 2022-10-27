@@ -1,10 +1,10 @@
 import React from 'react'
 
-export const Register = () => {
+export const Register: React.FC = () => {
   return (
-    <React.Fragment>
+    <>
         <div>Register</div>
-    </React.Fragment>
+    </>
   )
 }
 

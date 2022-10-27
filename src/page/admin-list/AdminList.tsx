@@ -1,9 +1,9 @@
 import React from 'react'
 
-export const AdminList = () => {
+export const AdminList: React.FC = () => {
   return (
-    <React.Fragment>
+    <>
         <div>AdminList</div>
-    </React.Fragment>
+    </>
   )
 }

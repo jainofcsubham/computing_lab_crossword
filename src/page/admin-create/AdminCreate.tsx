@@ -1,10 +1,10 @@
 import React from 'react'
 
-export const AdminCreate = () => {
+export const AdminCreate: React.FC = () => {
   return (
-    <React.Fragment>
+    <>
         <div>AdminCreate</div>
-    </React.Fragment>
+    </>
   )
 
 }
