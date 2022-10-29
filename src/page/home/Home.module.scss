@@ -1,0 +1,36 @@
+.container{
+    display: flex;
+    justify-content: space-between;
+    padding: 0 72px;
+}
+
+.left{
+    display: flex;
+    flex-direction: column;
+    justify-content: center ;
+    .text{
+        color: #012970;
+        font-size: 48px;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+    .get_started{
+        margin-top: 30px;
+        color: white;
+        background-color: #4154f1;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: none;
+        height: 48px;
+        width: 160px;
+        font-size: 16px;
+        &:hover{
+            background:  #5969f3;
+        }
+    }
+}
+.right{
+    .info_graphic{
+        width: 600px;
+    }
+}

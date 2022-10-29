@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { Button, TextField, Typography } from "@mui/material"
 import { useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { EMAIL_REGEX, PASSWORD_REGEX } from "../../utils/constant";
 import { LoginForm } from "../../utils/interface";
 import { useDatabaseContext } from "../../context/data.service";
+import styles from "./Login.module.scss"
 
 export const Login: React.FC = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<LoginForm>({});
   
@@ -36,28 +39,29 @@ export const Login: React.FC = () => {
 
   return (
     <>
-      <div>
-        <div>Login</div>
-        <div>
+      <Typography component={'div'}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div>
-              <input
+            <Typography className={styles.input_container} component={'div'}>
+              <TextField
                 placeholder="Email"
+                className={styles.input}
                 {...register("email", { required: true, pattern: EMAIL_REGEX })}
               />
               {errors.email && (
                 <>
                 {errors.email?.type === "required" && (
-                  <div className="error">Email is required.</div>
+                  <Typography component={'div'} className={styles.error}>Email is required.</Typography>
                 )}
                 {errors.email?.type === "pattern" && (
-                  <div className="error">Invalid Email.</div>
+                  <Typography component={'div'} className={styles.error}>Invalid Email.</Typography>
                 )}
               </>
               )}
-            </div>
-            <div>
-              <input
+            </Typography>
+            <Typography className={styles.input_container} component={'div'}>
+              <TextField
+              className={styles.input}
+              type="password"
                 placeholder="Password"
                 {...register("password", {
                   required: true,
@@ -67,23 +71,22 @@ export const Login: React.FC = () => {
               {errors.password && (
                 <>
                   {errors.password?.type === "required" && (
-                    <div className="error">Password is required.</div>
+                    <Typography component={'div'} className={styles.error}>Password is required.</Typography>
                   )}
                   {errors.password?.type === "pattern" && (
-                    <div className="error">Password should be alphanumeric with at least 8 characters having at least one special character.</div>
+                    <Typography component={'div'} className={styles.error}>Invalid Password.</Typography>
                   )}
                 </>
               )}
-            </div>
-            <div>
-              <button type="submit">Submit</button>
-            </div>
+            </Typography>
+            <Typography component={'div'}>
+              <Button variant="contained" className={styles.button} type="submit">Login</Button>
+            </Typography>
           </form>
           {
-            error && (<div>{error}</div>)
+            error && (<Typography  className={styles.global_error} component={'div'}>{error}</Typography>)
           }
-        </div>
-      </div>
+      </Typography>
     </>
   );
 };

@@ -1,0 +1,67 @@
+.container{
+    height: 84px;
+    padding: 20px 72px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    .logo{
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+    }
+    .brand{
+        font-size: 25px;
+        font-weight: 600;
+        color: #013289;
+    }
+}
+
+.right{
+    display: flex;
+    align-items: center;
+    .get_started{
+        color: white;
+        background-color: #4154f1;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: none;
+        height: 40px;
+        width: 125px;
+        font-size: 16px;
+        &:hover{
+            background:  #5969f3;
+        }
+    }
+
+    .profile_container{
+        display: flex;
+        align-items: center;
+    }
+    .profile_pic {
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        margin-left: 20px;
+    }
+
+    .manage_puzzle{
+        color: white;
+        background-color: #4154f1;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: none;
+        height: 40px;
+        // width: 125px;
+        font-size: 16px;
+        &:hover{
+            background:  #5969f3;
+        }
+    }
+
+}

@@ -1,14 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
+import {useNavigate} from "react-router-dom";
 import { DEFAULT_USER_AND_ADMIN } from "../utils/constant";
-import { User, Response, LoginForm } from "../utils/interface";
+import { User, Response, LoginForm, Puzzle } from "../utils/interface";
+import { PUZZLES } from "../utils/puzzle";
 
 export const useDataBase = () => {
+  const navigate = useNavigate()
   const [users, setUsers] = useState<ReadonlyArray<User>>([
     {
       ...DEFAULT_USER_AND_ADMIN,
     },
   ]);
 
+  const [puzzles,setPuzzles] = useState<ReadonlyArray<Puzzle>>([...PUZZLES])
   const [currentUser, setCurrentUser] = useState<User | undefined>();
 
   useEffect(() => {
@@ -73,11 +77,37 @@ export const useDataBase = () => {
     return { status: 0, message: "Profile Updated" ,data: {...user,picture}};
   },[users]);
 
+  const getPuzzleWithId = useCallback((id:number):Response => {
+    const puzzle = puzzles.find(each => each.id === id)
+    if(puzzle){
+      return {status : 0,message : 'Puzzle found.',data : {...puzzle}}
+    }
+    return {status : -1,message : 'Invalid Puzzle'} 
+  },[puzzles])
+
+  const addPuzzle = useCallback((puzzle : Puzzle):Response => {
+    setPuzzles(prev => {
+      return  [...prev,{...puzzle,id : prev.length + 1}]
+    })
+    return {status : 0,message : 'Puzzle added.'}
+  },[puzzles])
+
+  const getAllPuzzles = useCallback(() : ReadonlyArray<Puzzle>=> puzzles,[puzzles])
+
+  // TODO: Uncomment this once everything is done
+  // useEffect(() => {
+  //   if(!currentUser){
+  //     navigate("/login")
+  //   }
+  // },[currentUser])
   return {
     getUsers,
     registerUser,
     loginUser,
     getCurrentUser,
     updateProfilePicture,
+    getPuzzleWithId,
+    addPuzzle,
+    getAllPuzzles
   };
 };

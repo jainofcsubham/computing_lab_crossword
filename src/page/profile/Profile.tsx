@@ -1,4 +1,5 @@
 import React from 'react'
+import { Typography } from "@mui/material"
 import { ValidateLogin } from '../../component/validate-login/ValidateLogin'
 import { useDatabaseContext } from '../../context/data.service'
 import styles from "./Profile.module.css"
@@ -22,17 +23,17 @@ export const Profile: React.FC = () => {
   return (
     <>
     <ValidateLogin>
-        <div>
-          <div>
+        <Typography component={'div'}>
+          <Typography component={'div'}>
             {
               getCurrentUser()?.picture ? <><img src={getCurrentUser()?.picture} alt="big_profile" /></> : <><img src="/assets/profile.jpg" alt="big_profile" /></>
             }
             
             <label htmlFor="profile_input">Upload</label>
             <input onChange={onChange} className={styles.profile_input} id="profile_input"  type="file" accept="image/*"/>
-          </div>
-          <div></div>
-        </div>
+          </Typography>
+          <Typography component={'div'}></Typography>
+        </Typography>
     </ValidateLogin>
     </>
   )

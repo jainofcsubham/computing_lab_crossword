@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { Button, TextField, Typography } from "@mui/material";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useDatabaseContext } from "../../context/data.service";
 import { EMAIL_REGEX, NAME_REGEX, PASSWORD_REGEX } from "../../utils/constant";
 import { RegisterForm } from "../../utils/interface";
+import styles from "./Register.module.scss";
 
-export const Register: React.FC = () => {
+export const Register: React.FC<{ changeTab: (tab: "L" | "S") => void }> = ({
+  changeTab,
+}) => {
   const {
     formState: { errors },
     register,
@@ -22,115 +26,139 @@ export const Register: React.FC = () => {
     if (user) {
       navigate("/dashboard");
     }
-  },[]);
+  }, []);
 
-  const onSubmit: SubmitHandler<RegisterForm> = ({ email, password, name }):number => {
+  const onSubmit: SubmitHandler<RegisterForm> = ({
+    email,
+    password,
+    name,
+  }): number => {
     const response = registerUser({ email, isAdmin: false, password, name });
-    if(response.status === -1){
+    if (response.status === -1) {
       setError(response.message);
       return 0;
     }
-    navigate("/login");
+    changeTab("L");
     return 0;
   };
 
   return (
     <>
-      <div>
-        <div>Register</div>
-        <div>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div>
-              <input
-                placeholder="Name"
-                {...register("name", { required: true, pattern: NAME_REGEX })}
-              />
-              {errors.name && (
-                <>
-                  {errors.name.type === "required" && (
-                    <div>Name is required.</div>
-                  )}
-                  {errors.name.type === "pattern" && (
-                    <div>Name can only contain characters.</div>
-                  )}
-                </>
-              )}
-            </div>
-            <div>
-              <input
-                placeholder="Email"
-                {...register("email", { required: true, pattern: EMAIL_REGEX })}
-              />
-              {errors.email && (
-                <>
-                  {errors.email.type === "required" && (
-                    <div>Email is required.</div>
-                  )}
-                  {errors.email.type === "pattern" && <div>Invalid Email.</div>}
-                </>
-              )}
-            </div>
-            <div>
-              <input
-                placeholder="Password"
-                {...register("password", {
-                  required: true,
-                  pattern: PASSWORD_REGEX,
-                })}
-              />
-              {errors.password && (
-                <>
-                  {errors.password?.type === "required" && (
-                    <div className="error">Password is required.</div>
-                  )}
-                  {errors.password?.type === "pattern" && (
-                    <div className="error">
-                      Password should be alphanumeric with at least 8 characters
-                      having at least one special character.
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-            <div>
-              <input
-                placeholder="Re-type Password"
-                {...register("reTypePassword", {
-                  required: true,
-                  pattern: PASSWORD_REGEX,
-                  validate: (val: string) => {
-                    if (watch("password") !== val) {
-                      return "Passwords do no match.";
-                    }
-                  },
-                })}
-              />
-              {errors.reTypePassword && (
-                <>
-                  {errors.reTypePassword?.type === "required" && (
-                    <div className="error">Please re-enter password.</div>
-                  )}
-                  {errors.reTypePassword?.type === "pattern" ? (
-                    <div className="error">Passwords do no match.</div>
-                  ) : (
-                    <>
-                      {errors.reTypePassword?.type === "validate" && (
-                        <div className="error">Passwords do no match.</div>
-                      )}
-                    </>
-                  )}
-                </>
-              )}
-            </div>
-            <div>
-              <button type="submit">Submit</button>
-            </div>
-          </form>
-          {
-            error && (<div>{error}</div>)
-          }
-        </div>
-      </div>
+      <Typography component={"div"}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Typography className={styles.input_container} component={"div"}>
+            <TextField
+              className={styles.input}
+              placeholder="Name"
+              {...register("name", { required: true, pattern: NAME_REGEX })}
+            />
+            {errors.name && (
+              <>
+                {errors.name.type === "required" && (
+                  <Typography className={styles.error} component={"div"}>
+                    Name is required.
+                  </Typography>
+                )}
+                {errors.name.type === "pattern" && (
+                  <Typography className={styles.error} component={"div"}>
+                    Name can only contain characters.
+                  </Typography>
+                )}
+              </>
+            )}
+          </Typography>
+          <Typography className={styles.input_container} component={"div"}>
+            <TextField
+              className={styles.input}
+              placeholder="Email"
+              {...register("email", { required: true, pattern: EMAIL_REGEX })}
+            />
+            {errors.email && (
+              <>
+                {errors.email.type === "required" && (
+                  <Typography className={styles.error} component={"div"}>
+                    Email is required.
+                  </Typography>
+                )}
+                {errors.email.type === "pattern" && (
+                  <Typography className={styles.error} component={"div"}>
+                    Invalid Email.
+                  </Typography>
+                )}
+              </>
+            )}
+          </Typography>
+          <Typography className={styles.input_container} component={"div"}>
+            <TextField
+              className={styles.input}
+              placeholder="Password"
+              type={"password"}
+              {...register("password", {
+                required: true,
+                pattern: PASSWORD_REGEX,
+              })}
+            />
+            {errors.password && (
+              <>
+                {errors.password?.type === "required" && (
+                  <Typography className={styles.error} component={"div"}>
+                    Password is required.
+                  </Typography>
+                )}
+                {errors.password?.type === "pattern" && (
+                  <Typography className={styles.error} component={"div"}>
+                    Invalid Password.
+                  </Typography>
+                )}
+              </>
+            )}
+          </Typography>
+          <Typography className={styles.input_container} component={"div"}>
+            <TextField
+              className={styles.input}
+              type={"password"}
+              placeholder="Re-type Password"
+              {...register("reTypePassword", {
+                required: true,
+                pattern: PASSWORD_REGEX,
+                validate: (val: string) => {
+                  if (watch("password") !== val) {
+                    return "Passwords do no match.";
+                  }
+                },
+              })}
+            />
+            {errors.reTypePassword && (
+              <>
+                {errors.reTypePassword?.type === "required" && (
+                  <Typography className={styles.error} component={"div"}>
+                    Please re-enter password.
+                  </Typography>
+                )}
+                {errors.reTypePassword?.type === "pattern" ? (
+                  <Typography className={styles.error} component={"div"}>
+                    Passwords do no match.
+                  </Typography>
+                ) : (
+                  <>
+                    {errors.reTypePassword?.type === "validate" && (
+                      <Typography className={styles.error} component={"div"}>
+                        Passwords do no match.
+                      </Typography>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </Typography>
+          <Typography component={"div"}>
+            <Button variant="contained" className={styles.button} type="submit">
+              Sign up
+            </Button>
+          </Typography>
+        </form>
+        {error && <Typography className={styles.global_error} component={"div"}>{error}</Typography>}
+      </Typography>
     </>
   );
 };
