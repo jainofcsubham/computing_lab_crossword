@@ -9,13 +9,24 @@ export interface DatabaseType  {
     getPuzzleWithId : (id:number) => Response,
     addPuzzle : (puzzle : Puzzle) => Response
     getAllPuzzles : () => ReadonlyArray<Puzzle>
+    logoutUser : () => void,
+    deletePuzzle : (id:number) => Response,
+    freezePuzzle : (id: number) => Response,
+    getAllFreezedPuzzle : () => ReadonlyArray<Puzzle>,
+    updatePuzzle: (puzzle: Puzzle) => void,
+    getUserActiveGames: () => Response
 }
 export interface User {
   email: string;
   password: string;
   name: string;
   isAdmin: boolean;
-  picture ?: string
+  picture ?: string,
+  games ?:  ReadonlyArray<{
+    puzzle : Puzzle_Grid,
+    isCompleted : boolean,
+    time : number
+  }>
 }
 
 export interface Response {
@@ -43,7 +54,9 @@ export interface Cell_Config {
 export interface Puzzle {
   size : number,
   id : number,
-  config : ReadonlyArray<Cell_Config>
+  name : string,
+  config : ReadonlyArray<Cell_Config>,
+  freezed : boolean
 }
 
 //Type of cell after massaging
@@ -63,6 +76,7 @@ export interface Hint {
 export interface Puzzle_Grid {
   size : number,
   across : ReadonlyArray<Hint>,
+  name: string,
   down : ReadonlyArray<Hint>,
   config : ReadonlyArray<Grid_Cell>
 }

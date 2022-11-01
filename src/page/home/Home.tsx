@@ -17,7 +17,7 @@ export const Home : React.FC= () => {
         <Typography className={styles.left} component={'div'}>
           <Typography className={styles.text} component={'div'}>Your one step solution for mind boggling crossword puzzles.</Typography>
           <Typography component={'div'}>
-            <Button onClick={onNavigation} className={styles.get_started} variant='contained' >Get Started </Button>
+            <Button onClick={onNavigation} className={styles.get_started} variant='contained' >Get Puzzling</Button>
           </Typography>
         </Typography>
         <Typography className={styles.right} component={'div'}>

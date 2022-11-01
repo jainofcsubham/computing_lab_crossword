@@ -9,7 +9,7 @@ export const ValidateLogin: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("crossword_logged_in");
     if (!isLoggedIn) {
-      navigate("/login");
+      navigate("/");
     }
     setShow(true);
   }, []);

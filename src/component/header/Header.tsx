@@ -1,36 +1,43 @@
 import React, { useState } from "react";
-import { Typography, Button, Popover } from "@mui/material";
+import { Typography, Popover } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDatabaseContext } from "../../context/data.service";
 import styles from "./Header.module.scss";
 
 export const Header: React.FC = () => {
-  const { getCurrentUser } = useDatabaseContext();
+  const { getCurrentUser ,logoutUser} = useDatabaseContext();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const onNavigation = (path: string) => {
+    handleClose()
     if (pathname !== path) {
       navigate(path);
     }
   };
 
-  const handleClick = (event:any) => {
+  const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+
+  const onLogout = (_e:any) => {
+    handleClose()
+    logoutUser()
+    localStorage.removeItem("crossword_logged_in")
+    navigate("/")
+  }
 
   return (
     <>
       <Typography className={styles.container} component={"div"}>
         <Typography
           onClick={() => {
-            onNavigation("/");
+            getCurrentUser() ?  onNavigation("/dashboard") : onNavigation("/");
           }}
           className={styles.left}
           component={"div"}
@@ -48,7 +55,7 @@ export const Header: React.FC = () => {
                   <Button
                     className={styles.manage_puzzle}
                     onClick={() => {
-                      onNavigation("/admin/list");
+                      onNavigation("/admin");
                     }}
                   >
                     Manage Puzzles
@@ -69,26 +76,25 @@ export const Header: React.FC = () => {
                 ) : (
                   <img
                     className={styles.profile_pic}
-                    src="/assets/profile.jpg"
+                    src="/assets/profile.png"
                     alt="profile"
                   />
                 )}
               </Typography>
             </>
           ) : (
-            <Typography component={"div"}>
-              <Typography component={"div"}>
-                <Button
-                  className={styles.get_started}
-                  variant="contained"
-                  onClick={() => {
-                    onNavigation("/get-started");
-                  }}
-                >
-                  Get Started
-                </Button>
-              </Typography>
-            </Typography>
+            <></>
+            //   <Typography component={"div"}>
+            //     <Button
+            //       className={styles.get_started}
+            //       variant="contained"
+            //       onClick={() => {
+            //         onNavigation("/get-started");
+            //       }}
+            //     >
+            //       Get Puzzling
+            //     </Button>
+            // </Typography>
           )}
         </Typography>
       </Typography>
@@ -99,14 +105,63 @@ export const Header: React.FC = () => {
         anchorEl={anchorEl}
         onClose={handleClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
+          vertical: "bottom",
+          horizontal: "right",
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
+          vertical: "top",
+          horizontal: "right",
         }}
-      >Subham  Jain</Popover>
+      >
+        <Typography className={styles.popover_container} component={"div"}>
+          <>
+            <Typography onClick={() =>{onNavigation("/profile")}} className={styles.popover_item} component={"div"}>
+              {getCurrentUser()?.picture ? (
+                <img
+                  className={styles.popover_item_img}
+                  src={getCurrentUser()?.picture}
+                  alt="profile"
+                />
+              ) : (
+                <img
+                  className={styles.popover_item_img}
+                  src="/assets/profile.png"
+                  alt="profile"
+                />
+              )}{" "}
+              <Typography style={{ fontSize: "16px" }} component={"div"}>
+                {getCurrentUser() ? getCurrentUser()?.name : "Profile"}
+              </Typography>
+            </Typography>
+          </>
+          {getCurrentUser()?.isAdmin && (
+            <>
+              <Typography onClick={() =>{onNavigation("/admin")}} className={styles.popover_item} component={"div"}>
+                <img
+                  alt="logout"
+                  className={styles.popover_item_img}
+                  src="./assets/settings.png"
+                />
+                <Typography style={{ fontSize: "16px" }} component={"div"}>
+                  Manage Puzzles
+                </Typography>
+              </Typography>
+            </>
+          )}
+          <>
+            <Typography onClick={onLogout} className={styles.popover_item} component={"div"}>
+              <img
+                alt="logout"
+                className={styles.popover_item_img}
+                src="./assets/logout.png"
+              />
+              <Typography style={{ fontSize: "16px" }} component={"div"}>
+                Logout
+              </Typography>
+            </Typography>
+          </>
+        </Typography>
+      </Popover>
     </>
   );
 };

@@ -18,7 +18,13 @@ const database = createContext<DatabaseType>({
   },
   getPuzzleWithId : (id:number) => ({status : -1,message : "'"}),
   addPuzzle : (puzzle:Puzzle) => ({status : -1,message : "'"}),
-  getAllPuzzles : () => ([])
+  getAllPuzzles : () => ([]),
+  logoutUser : () => {},
+  deletePuzzle : (id:number) => ({status : -1,message : ""}),
+  freezePuzzle : (id:number) => ({status : -1,message : ""}),
+  getAllFreezedPuzzle : () => ([]),
+  updatePuzzle: (puzzle: Puzzle) => {},
+  getUserActiveGames : () => ({status : -1,message :''})
 });
 
 export const useDatabaseContext = () => useContext(database);

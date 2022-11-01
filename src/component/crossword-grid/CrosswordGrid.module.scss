@@ -1,18 +1,18 @@
 .row{
     display: flex;
     flex-direction: row;
-    border: 1px solid black;
+    border: 1px solid #6674ee;
     border-top: none;
     height: 40px;
     &:first-child{
-        border-top: 1px solid black;
+        border-top: 1px solid #6674ee;
     }
 }
 
 .cell {
     width: 40px;
     height: 40px;
-    border-right: 1px solid black;
+    border-right: 1px solid #6674ee;
     position: relative;
     &:last-child{
         border-right:  none;
@@ -32,16 +32,24 @@
         font-size: 20px;
         text-transform: uppercase;
         caret-color: transparent;
+        color: rgb(83, 83, 83);
         &:focus{
-            background: lightgray;
+            color: white !important;
+            background: #9ea7f5;
         }
+    }
+    .error_cell{
+        color: rgb(211, 47, 47);
     }
 }
 
 .black_cell{
-    background: black;
+    background: #6674ee;
 }
 
-.white_cell{
-
+.focused_cell{
+    background: #9ea7f5;
+    .superscript{
+        color: white !important;
+    }
 }

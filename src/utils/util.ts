@@ -1,9 +1,11 @@
 import { Grid_Cell, Hint, Puzzle, Puzzle_Grid } from "./interface";
 
-export const makeGrid = (config: Puzzle): Puzzle_Grid => {
+export const makeGrid = (config: Puzzle,obj :{prefill ?: boolean} = {}): {grid : Puzzle_Grid, error : boolean} => {
   let finalConfig: Grid_Cell[] = [];
+  const {prefill = false} = obj
   const rows = config.size;
   const numberOfCells = config.size * config.size;
+  let error = false;
   for (let i = 1; i <= numberOfCells; i++) {
     finalConfig = [
       ...finalConfig,
@@ -26,12 +28,17 @@ export const makeGrid = (config: Puzzle): Puzzle_Grid => {
       } else {
         cellIndex = cell + i * rows - 1;
       }
-      finalConfig[cellIndex] = {
-        ...finalConfig[cellIndex],
-        superscript: i === 0 ? index : finalConfig[cellIndex].superscript,
-        isWhiteCell: true,
-        answer: value[i],
-      };
+      if(finalConfig[cellIndex].isWhiteCell && finalConfig[cellIndex].answer !== value[i]){
+        error =true;
+      }else{
+        finalConfig[cellIndex] = {
+          ...finalConfig[cellIndex],
+          superscript: i === 0 ? index : finalConfig[cellIndex].superscript,
+          isWhiteCell: true,
+          value : prefill ? value[i] : '',
+          answer: value[i],
+        };
+      }
     }
   });
 
@@ -45,5 +52,5 @@ export const makeGrid = (config: Puzzle): Puzzle_Grid => {
       across = [...across, { index, hint ,cell}];
     }
   });
-  return { size: rows, across, down, config: finalConfig };
+  return {grid :{name:config.name, size: rows, across, down, config: [...finalConfig] },error};
 };

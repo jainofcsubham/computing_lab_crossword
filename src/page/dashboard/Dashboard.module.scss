@@ -1,9 +1,101 @@
-.item{
-    width: 300px;
-    height:200px;
+.item {
+  width: 300px;
+  height: 200px;
+  margin-bottom: 20px !important;
+  border-radius: 6px;
+  border: 1px solid #4154f1;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  .grid_parent {
+    transform: scale(0.2);
+    // transform: scale(0.2) translate(-50%, -150%);
+    // position: absolute;
+    // top: 20px;
+    // left: -61px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .game_heading {
     border-radius: 5px;
-     border: 1px solid gray;
-    .grid_parent{
-        transform: scale(0.2) translate(-50%,-150%);
+    height: 50px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    background-color: #4154f1;
+    color: white;
+    font-weight: bold;
+    border-bottom-left-radius: unset;
+    border-bottom-right-radius: unset;
+    border-bottom: 1px solid #4154f1;
+  }
+  .play_game {
+    display: none;
+    img {
+      width: 100px;
+      height: 100px;
     }
+  }
+  &:hover {
+    .game_heading {
+      background: #5969f3;
+    }
+    .play_game {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5);
+      flex-grow: 1;
+      position: absolute;
+      top: 50px;
+      width: 298px;
+      height: 148px;
+      border-radius: 5px;
+      border-top-left-radius: unset;
+      border-top-right-radius: unset;
+      z-index: 2;
+      color: white;
+      font-size: 24px;
+      font-weight: 600;
+    }
+  }
+}
+
+.container {
+  padding: 0 72px;
+  .heading {
+    color: #013289;
+    font-size: 20px;
+    padding-bottom: 5px;
+    border-bottom: 4px solid #013289;
+    font-weight: 600;
+    margin: 20px 0;
+  }
+  .heading_1 {
+    width: 142px;
+  }
+  .heading_2 {
+    width: 107px;
+  }
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 300px);
+  grid-gap: 1rem;
+  justify-content: space-between;
+}
+
+.wrapper {
+  width: 100px;
+  height: 100px;
+  left: 100px;
+  top: 75px;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

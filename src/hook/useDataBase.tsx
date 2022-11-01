@@ -1,26 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { DEFAULT_USER_AND_ADMIN } from "../utils/constant";
 import { User, Response, LoginForm, Puzzle } from "../utils/interface";
 import { PUZZLES } from "../utils/puzzle";
 
 export const useDataBase = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [users, setUsers] = useState<ReadonlyArray<User>>([
     {
       ...DEFAULT_USER_AND_ADMIN,
     },
   ]);
 
-  const [puzzles,setPuzzles] = useState<ReadonlyArray<Puzzle>>([...PUZZLES])
+  const [puzzles, setPuzzles] = useState<ReadonlyArray<Puzzle>>([...PUZZLES]);
   const [currentUser, setCurrentUser] = useState<User | undefined>();
 
   useEffect(() => {
-    if(currentUser?.email){
-      const user = users.find(each => each.email === currentUser.email)
+    if (currentUser?.email) {
+      const user = users.find((each) => each.email === currentUser.email);
       setCurrentUser(user);
     }
-  },[users])
+  }, [users]);
 
   const getUsers = useCallback((): ReadonlyArray<User> => users, [users]);
   const registerUser = useCallback(
@@ -58,48 +58,123 @@ export const useDataBase = () => {
 
   const getCurrentUser = useCallback(() => currentUser, [currentUser]);
 
-  const updateProfilePicture = useCallback((email: string, picture: string): Response => {
-    const user = users.find((each) => each.email === email);
-    if (!user) {
-      return { message: `Invalid email or password.`, status: -1 };
-    }
-    setUsers((prev) => {
-      return prev.map((each) => {
-        if (each.email === email) {
-          return {
-            ...each,
-            picture,
-          };
-        }
-        return { ...each };
+  const updateProfilePicture = useCallback(
+    (email: string, picture: string): Response => {
+      const user = users.find((each) => each.email === email);
+      if (!user) {
+        return { message: `Invalid email or password.`, status: -1 };
+      }
+      setUsers((prev) => {
+        return prev.map((each) => {
+          if (each.email === email) {
+            return {
+              ...each,
+              picture,
+            };
+          }
+          return { ...each };
+        });
       });
-    });
-    return { status: 0, message: "Profile Updated" ,data: {...user,picture}};
-  },[users]);
+      return {
+        status: 0,
+        message: "Profile Updated",
+        data: { ...user, picture },
+      };
+    },
+    [users]
+  );
 
-  const getPuzzleWithId = useCallback((id:number):Response => {
-    const puzzle = puzzles.find(each => each.id === id)
-    if(puzzle){
-      return {status : 0,message : 'Puzzle found.',data : {...puzzle}}
+  const getPuzzleWithId = useCallback(
+    (id: number): Response => {
+      const puzzle = puzzles.find((each) => each.id === id);
+      if (puzzle) {
+        return { status: 0, message: "Puzzle found.", data: { ...puzzle } };
+      }
+      return { status: -1, message: "Invalid Puzzle" };
+    },
+    [puzzles]
+  );
+
+  const addPuzzle = useCallback(
+    (puzzle: Puzzle): Response => {
+      setPuzzles((prev) => {
+        return [...prev, { ...puzzle, id: prev[prev.length -1].id + 1 }];
+      });
+      return { status: 0, message: "Puzzle added." };
+    },
+    [puzzles]
+  );
+
+  const getAllPuzzles = useCallback(
+    (): ReadonlyArray<Puzzle> => puzzles,
+    [puzzles]
+  );
+
+  const logoutUser = useCallback(() => {
+    setCurrentUser(undefined);
+  }, [currentUser]);
+
+  const deletePuzzle = useCallback(
+    (id: number): Response => {
+      setPuzzles((prev) => {
+        return prev.filter((each) => each.id !== id);
+      });
+      return { status: 0, message: "Deleted Successfully" };
+    },
+    [puzzles]
+  );
+
+  const freezePuzzle = useCallback(
+    (id: number): Response => {
+      setPuzzles((prev) => {
+        return prev.map((each) => {
+          if (each.id === id) {
+            return { ...each, freezed: true };
+          }
+          return { ...each };
+        });
+      });
+      return { status: 0, message: "Freezed successfully" };
+    },
+    [puzzles]
+  );
+
+  const getAllFreezedPuzzle = useCallback((): ReadonlyArray<Puzzle> => {
+    return puzzles.filter((each) => each.freezed);
+  }, [puzzles]);
+
+  const updatePuzzle = useCallback(
+    (puzzle: Puzzle) => {
+      const id = puzzle.id;
+      setPuzzles((prev) => {
+        return prev.map((each) => {
+          if (each.id === id) {
+            return { ...puzzle };
+          }
+          return { ...each };
+        });
+      });
+    },
+    [puzzles]
+  );
+
+  const getUserActiveGames = useCallback((): Response => {
+    const userMail = currentUser?.email
+    if(userMail){
+      return {status : -1, message :"Found", data : {
+        games : users.find(each => each.email === userMail)?.games?.filter(each => !each.isCompleted)
+      }}
     }
-    return {status : -1,message : 'Invalid Puzzle'} 
-  },[puzzles])
+    return {status : -1, message : "No user found."}
+  },[users,currentUser])
 
-  const addPuzzle = useCallback((puzzle : Puzzle):Response => {
-    setPuzzles(prev => {
-      return  [...prev,{...puzzle,id : prev.length + 1}]
-    })
-    return {status : 0,message : 'Puzzle added.'}
-  },[puzzles])
 
-  const getAllPuzzles = useCallback(() : ReadonlyArray<Puzzle>=> puzzles,[puzzles])
+  useEffect(() => {
+    if(!currentUser){
+      navigate("/")
+    }
+  },[currentUser])
 
-  // TODO: Uncomment this once everything is done
-  // useEffect(() => {
-  //   if(!currentUser){
-  //     navigate("/login")
-  //   }
-  // },[currentUser])
   return {
     getUsers,
     registerUser,
@@ -108,6 +183,12 @@ export const useDataBase = () => {
     updateProfilePicture,
     getPuzzleWithId,
     addPuzzle,
-    getAllPuzzles
+    getAllPuzzles,
+    logoutUser,
+    deletePuzzle,
+    freezePuzzle,
+    getAllFreezedPuzzle,
+    updatePuzzle,
+    getUserActiveGames
   };
 };
