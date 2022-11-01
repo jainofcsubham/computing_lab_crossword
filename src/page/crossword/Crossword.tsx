@@ -1,12 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Typography,
+} from "@mui/material";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { CrosswordGrid } from "../../component/crossword-grid/CrosswordGrid";
 import { ValidateLogin } from "../../component/validate-login/ValidateLogin";
 import { useDatabaseContext } from "../../context/data.service";
-import { Puzzle, Puzzle_Grid } from "../../utils/interface";
+import { DirtyGame, Puzzle, Puzzle_Grid } from "../../utils/interface";
 import { makeGrid } from "../../utils/util";
 import styles from "./Crossword.module.scss";
+import useInterval from 'use-interval'
 
 export const Crossword: React.FC = () => {
   const pathParams = useParams();
@@ -20,7 +29,8 @@ export const Crossword: React.FC = () => {
     config: [],
     name: "",
   });
-  const [openDialog,setOpenDialog] = useState<boolean>(false)
+  const [openWinDialog,setOpenWinDialog] = useState<boolean>(false)
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const [validation, setValidation] = useState<{
     totalWhiteCells: number;
@@ -33,50 +43,58 @@ export const Crossword: React.FC = () => {
   });
   const [currentTab, setCurrentTab] = useState<"H" | "V">("H");
   const [time, setTime] = useState(0);
-  const { getPuzzleWithId, getUserActiveGames } = useDatabaseContext();
+  const { getPuzzleWithId, getUserActiveGames, saveGame, deleteActiveGame } =
+    useDatabaseContext();
+
+    useInterval(() => {
+      savePuzzle(false);
+    },60000)
+
+    useInterval(() => {
+      if(validation.correctCells !== validation.totalWhiteCells){
+        setTime((prev) => prev + 1);
+      }
+    },1000)
 
   useEffect(() => {
-    let id = pathParams.id;
-    const type = searchParams.get("type");
-    if (!type || (type && type !== "resume" && type !== "new")) {
-      navigate("/dashboard");
-    }
-    const allActiveGames = getUserActiveGames()?.data?.games;
-    if (type === "new") {
-      if (Array.isArray(allActiveGames) && allActiveGames.length) {
-        const currentActiveGame = allActiveGames.find(
-          (each) => each?.puzzle?.id === id && !each.isCompleted
-        );
-        if (currentActiveGame) {
-          // Show a popup for preload
+    let id: any = pathParams.id;
+    if (id) {
+      id = Number(id);
+      const type = searchParams.get("type");
+      if (!type || (type && type !== "resume" && type !== "new")) {
+        navigate("/dashboard");
+      }
+      const allActiveGames = getUserActiveGames()?.data?.games;
+      const currentActiveGame: DirtyGame | undefined =
+        allActiveGames && Array.isArray(allActiveGames) && allActiveGames.length
+          ? allActiveGames.find((each) => each?.id === id && !each.isCompleted)
+          : undefined;
+      if (type === "resume") {
+        if (!currentActiveGame) {
+          navigate("/dashboard");
         } else {
-          if (id) {
-            //@TODO: Fetch from the user games if not found fetch from DB.
-            const response = getPuzzleWithId(Number(id));
-            //@TODO: Set time based on the returned puzzle
-            if (response.status === -1) {
-              navigate("/dashboard");
-            }
-            const puzzleConfig: Puzzle = response.data as Puzzle;
-            const grid = makeGrid(puzzleConfig).grid;
-            let whiteCells = 0;
-            grid.config.forEach((each) => {
-              if (each.isWhiteCell) {
-                whiteCells++;
+          let whiteCells = 0;
+          let correctCells = 0;
+          currentActiveGame.puzzle.config.forEach((each) => {
+            if (each.isWhiteCell) {
+              whiteCells++;
+              if (each.answer === each.value) {
+                correctCells++;
               }
-            });
-            setValidation({
-              totalWhiteCells: whiteCells,
-              correctCells: 0,
-              showErrors: false,
-            });
-            setCurrentPuzzle(makeGrid(puzzleConfig).grid);
-          } else {
-            navigate("/dashboard");
-          }
+            }
+          });
+          setValidation({
+            totalWhiteCells: whiteCells,
+            correctCells,
+            showErrors: false,
+          });
+          setTime(currentActiveGame.time);
+          setCurrentPuzzle(currentActiveGame.puzzle);
         }
-      } else {
-        if (id) {
+      } else if (type === "new") {
+        if (currentActiveGame) {
+          setOpenDialog(true);
+        } else {
           const response = getPuzzleWithId(Number(id));
           if (response.status === -1) {
             navigate("/dashboard");
@@ -95,56 +113,19 @@ export const Crossword: React.FC = () => {
             showErrors: false,
           });
           setCurrentPuzzle(makeGrid(puzzleConfig).grid);
-        } else {
-          navigate("/dashboard");
         }
+      } else {
+        navigate("/dashboard");
       }
     } else {
-      if (Array.isArray(allActiveGames) && allActiveGames.length) {
-        const currentActiveGame = allActiveGames.find(
-          (each) => each?.puzzle?.id === id && !each.isCompleted
-        );
-        if (currentActiveGame) {
-          let whiteCells = 0;
-          let correctCells = 0;
-          const grid = currentActiveGame.puzzle as Puzzle_Grid;
-          grid.config.forEach((each) => {
-            if (each.isWhiteCell) {
-              whiteCells++;
-              if (each.answer === each.value) {
-                correctCells++;
-              }
-            }
-          });
-          setValidation({
-            totalWhiteCells: whiteCells,
-            correctCells,
-            showErrors: false,
-          });
-          setCurrentPuzzle(grid);
-        } else {
-          navigate("/dashboard");
-        }
-      }
+      navigate("/dashboard");
     }
-    const interval = setInterval(() => {
-      setTime((prev) => prev + 1);
-    }, 1000);
-
-    const saveInterval = setInterval(() => {
-
-    }, 60000);
-
-    return () => {
-      clearInterval(interval);
-      clearInterval(saveInterval);
-    };
   }, []);
 
   useEffect(() => {
     let correctCells = 0;
     currentPuzzle.config.forEach((each) => {
-      if (each.answer === each.value && each.isWhiteCell) {
+      if (each.answer === each.value.toLowerCase() && each.isWhiteCell) {
         correctCells++;
       }
     });
@@ -156,8 +137,8 @@ export const Crossword: React.FC = () => {
       currentPuzzle.size &&
       validation.correctCells === validation.totalWhiteCells
     ) {
-      // Show success popup and redirect to dashboard
-      navigate("/dashboard");
+      savePuzzle(true);
+      setOpenWinDialog(true)
     }
   }, [validation]);
 
@@ -226,6 +207,81 @@ export const Crossword: React.FC = () => {
     }
   };
 
+  const resume = () => {
+    let id: any = pathParams.id;
+    if (id) {
+      id = Number(id);
+    } else {
+      navigate("/dashboard");
+    }
+    const allActiveGames = getUserActiveGames()?.data?.games;
+    const currentActiveGame: DirtyGame | undefined =
+      allActiveGames && Array.isArray(allActiveGames) && allActiveGames.length
+        ? allActiveGames.find((each) => each?.id === id && !each.isCompleted)
+        : undefined;
+    let whiteCells = 0;
+    let correctCells = 0;
+    if (currentActiveGame) {
+      currentActiveGame.puzzle.config.forEach((each) => {
+        if (each.isWhiteCell) {
+          whiteCells++;
+          if (each.answer === each.value) {
+            correctCells++;
+          }
+        }
+      });
+      setValidation({
+        totalWhiteCells: whiteCells,
+        correctCells,
+        showErrors: false,
+      });
+      setTime(currentActiveGame.time);
+      setCurrentPuzzle(currentActiveGame.puzzle);
+      setOpenDialog(false);
+    } else {
+      navigate("/dashboard");
+    }
+  };
+
+  const restart = () => {
+    let id: any = pathParams.id;
+    if (id) {
+      id = Number(id);
+    } else {
+      navigate("/dashboard");
+    }
+    const response = getPuzzleWithId(id);
+    if (response.status === -1) {
+      navigate("/dashboard");
+    }
+    const puzzleConfig: Puzzle = response.data as Puzzle;
+    const grid = makeGrid(puzzleConfig).grid;
+    let whiteCells = 0;
+    grid.config.forEach((each) => {
+      if (each.isWhiteCell) {
+        whiteCells++;
+      }
+    });
+    setValidation({
+      totalWhiteCells: whiteCells,
+      correctCells: 0,
+      showErrors: false,
+    });
+    setCurrentPuzzle(makeGrid(puzzleConfig).grid);
+    deleteActiveGame(id);
+    setOpenDialog(false);
+  };
+
+  const savePuzzle = useCallback((isCompleted: boolean) => {
+    if (pathParams.id) {
+      saveGame({
+        puzzle: currentPuzzle,
+        id: Number(pathParams.id),
+        isCompleted,
+        time,
+      });
+    }
+  },[time,currentPuzzle]);
   return (
     <>
       <ValidateLogin>
@@ -311,15 +367,30 @@ export const Crossword: React.FC = () => {
             </Typography>
           </Typography>
           <Typography className={styles.right} component={"div"}>
-            {currentPuzzle && currentPuzzle.size && (
+            {currentPuzzle && currentPuzzle.size > 0 && (
               <>
                 <Typography
-                  style={{ maxWidth: `${currentPuzzle.size * 40}px` }}
                   className={styles.puzzle_container}
                   component={"div"}
                 >
                   <Typography className={styles.toolbar} component={"div"}>
+                    <Typography className={styles.timer} component={"div"}>
+                      <span>Time:</span>{" "}
+                      {Math.floor(time / 60)
+                        .toString()
+                        .padStart(2, "0")}{" "}
+                      : {(time % 60).toString().padStart(2, "0")}
+                    </Typography>
                     <Typography className={styles.validator} component={"div"}>
+                      <Button
+                        onClick={() => {
+                          savePuzzle(false);
+                        }}
+                        className={styles.button}
+                      >
+                        <img alt="validate" src="../assets/save.png" />
+                        Save
+                      </Button>
                       <Button
                         onClick={validatePuzzle}
                         className={styles.button}
@@ -328,23 +399,21 @@ export const Crossword: React.FC = () => {
                         Validate
                       </Button>
                     </Typography>
-                    <Typography className={styles.timer} component={"div"}>
-                      <span>Time:</span>{" "}
-                      {Math.floor(time / 60)
-                        .toString()
-                        .padStart(2, "0")}{" "}
-                      : {(time % 60).toString().padStart(2, "0")}
-                    </Typography>
                   </Typography>
-                  <CrosswordGrid
-                    puzzle={currentPuzzle}
-                    setCell={setCell}
-                    showErrors={validation.showErrors}
-                  />
-                  <Typography component={"div"}>
-                    <ul>
-                      <li>Game is auto-saved every minute.</li>
-                    </ul>
+                  <Typography
+                    style={{ maxWidth: `${currentPuzzle.size * 40}px`, margin : '0 auto' }}
+                    component={"div"}
+                  >
+                    <CrosswordGrid
+                      puzzle={currentPuzzle}
+                      setCell={setCell}
+                      showErrors={validation.showErrors}
+                    />
+                    <Typography component={"div"}>
+                      <ul>
+                        <li>Game is auto-saved every minute.</li>
+                      </ul>
+                    </Typography>
                   </Typography>
                 </Typography>
               </>
@@ -352,20 +421,36 @@ export const Crossword: React.FC = () => {
           </Typography>
         </Typography>
 
-        <Dialog open={openDialog} onClose={() => {
-          setOpenDialog(false);
-        }}>
+        <Dialog
+          open={openDialog}
+          onClose={() => {
+            setOpenDialog(false);
+          }}
+        >
           <DialogTitle>{"Load existing game?"}</DialogTitle>
           <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            This will load your "In Progress" puzzle.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => {}}>Disagree</Button>
-          <Button onClick={() => {}}>Agree</Button>
-        </DialogActions>
+            <DialogContentText id="alert-dialog-slide-description">
+              This will load your "In Progress" puzzle.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={restart}>Disagree</Button>
+            <Button onClick={resume}>Agree</Button>
+          </DialogActions>
         </Dialog>
+        <Dialog
+          open={openWinDialog}
+          onClose={() => {
+            navigate("/dashboard")
+          }}
+        >
+          <Typography component={'div'} className={styles.win_wrapper}>
+            <img src="/assets/win.webp" alt="win" />
+            <Typography component={'div'}>Congratulations!! You won.</Typography>
+            <Typography component={'div'}>You took {Math.floor(time/60).toString().padStart(2,'0')}:{(time%60).toString().padStart(2,'0')} minutes.</Typography>
+            <Button variant="contained" className={styles.btn} onClick={() => {navigate("/dashboard")}}> Continue</Button>
+          </Typography>
+          </Dialog>
       </ValidateLogin>
     </>
   );

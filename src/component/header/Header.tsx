@@ -32,6 +32,11 @@ export const Header: React.FC = () => {
     navigate("/")
   }
 
+  const onHistory = () => {
+    handleClose()
+    navigate("/history")
+  }
+
   return (
     <>
       <Typography className={styles.container} component={"div"}>
@@ -84,17 +89,6 @@ export const Header: React.FC = () => {
             </>
           ) : (
             <></>
-            //   <Typography component={"div"}>
-            //     <Button
-            //       className={styles.get_started}
-            //       variant="contained"
-            //       onClick={() => {
-            //         onNavigation("/get-started");
-            //       }}
-            //     >
-            //       Get Puzzling
-            //     </Button>
-            // </Typography>
           )}
         </Typography>
       </Typography>
@@ -140,7 +134,7 @@ export const Header: React.FC = () => {
                 <img
                   alt="logout"
                   className={styles.popover_item_img}
-                  src="./assets/settings.png"
+                  src="/assets/settings.png"
                 />
                 <Typography style={{ fontSize: "16px" }} component={"div"}>
                   Manage Puzzles
@@ -149,11 +143,23 @@ export const Header: React.FC = () => {
             </>
           )}
           <>
+            <Typography onClick={onHistory} className={styles.popover_item} component={"div"}>
+              <img
+                alt="history"
+                className={styles.popover_item_img}
+                src="/assets/history.png"
+              />
+              <Typography style={{ fontSize: "16px" }} component={"div"}>
+                History
+              </Typography>
+            </Typography>
+          </>
+          <>
             <Typography onClick={onLogout} className={styles.popover_item} component={"div"}>
               <img
                 alt="logout"
                 className={styles.popover_item_img}
-                src="./assets/logout.png"
+                src="/assets/logout.png"
               />
               <Typography style={{ fontSize: "16px" }} component={"div"}>
                 Logout

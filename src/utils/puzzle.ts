@@ -322,7 +322,7 @@ const puzzle_config_3: Puzzle = {
     },
     {
       index: 5,
-      cell: 5,
+      cell: 6,
       length: 5,
       hint: "Pop musician ___ Rae Jepsen",
       value: "carly",

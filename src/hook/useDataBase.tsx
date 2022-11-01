@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DEFAULT_USER_AND_ADMIN } from "../utils/constant";
-import { User, Response, LoginForm, Puzzle } from "../utils/interface";
+import {
+  User,
+  Response,
+  LoginForm,
+  Puzzle,
+  Puzzle_Grid,
+  DirtyGame,
+} from "../utils/interface";
 import { PUZZLES } from "../utils/puzzle";
 
 export const useDataBase = () => {
@@ -98,7 +105,7 @@ export const useDataBase = () => {
   const addPuzzle = useCallback(
     (puzzle: Puzzle): Response => {
       setPuzzles((prev) => {
-        return [...prev, { ...puzzle, id: prev[prev.length -1].id + 1 }];
+        return [...prev, { ...puzzle, id: prev[prev.length - 1].id + 1 }];
       });
       return { status: 0, message: "Puzzle added." };
     },
@@ -159,21 +166,111 @@ export const useDataBase = () => {
   );
 
   const getUserActiveGames = useCallback((): Response => {
-    const userMail = currentUser?.email
-    if(userMail){
-      return {status : -1, message :"Found", data : {
-        games : users.find(each => each.email === userMail)?.games?.filter(each => !each.isCompleted)
-      }}
+    const userMail = currentUser?.email;
+    if (userMail) {
+      return {
+        status: -1,
+        message: "Found",
+        data: {
+          games: users
+            .find((each) => each.email === userMail)
+            ?.games?.filter((each) => !each.isCompleted),
+        },
+      };
     }
-    return {status : -1, message : "No user found."}
-  },[users,currentUser])
+    return { status: -1, message: "No user found." };
+  }, [users, currentUser]);
 
+  useEffect(() =>{
+    console.log(users);
+  },[users])
+
+  const saveGame = useCallback(
+    (game: DirtyGame): Response => {
+      if (currentUser) {
+        setUsers((prev) => {
+          return prev.map((each) => {
+            if (each.email === currentUser.email) {
+              const gameFound =
+                each.games && Array.isArray(each.games) && each.games.length > 0
+                  ? each.games.find((item) => item.id === game.id && !item.isCompleted)
+                  : undefined;
+              if (gameFound) {
+                const games: ReadonlyArray<DirtyGame> =
+                  each.games &&
+                  Array.isArray(each.games) &&
+                  each.games.length > 0
+                    ? each.games.map((item: DirtyGame) => {
+                        if (item.id === game.id) {
+                          return {
+                            ...game,
+                          };
+                        }
+                        return { ...item };
+                      })
+                    : [{ ...game }];
+                return {
+                  ...each,
+                  games,
+                };
+              } else {
+                return {
+                  ...each,
+                  games:
+                    each?.games?.length && each?.games?.length > 0
+                      ? [...each.games, { ...game }]
+                      : [{ ...game }],
+                };
+              }
+            }
+            return { ...each };
+          });
+        });
+        return { status: 0, message: "Success" };
+      }
+      return { status: -1, message: "" };
+    },
+    [puzzles, currentUser,users]
+  );
+
+  const deleteActiveGame = useCallback((id:number) => {
+    if(currentUser){
+      const email = currentUser.email
+      setUsers(prev  => {
+        return prev.map(each => {
+          if(each.email ===  email){
+            return {
+              ...each,
+              games : each.games && each.games.length && each.games.length > 0 ? each.games.filter(game => game.id !== id || game.isCompleted) : []
+            }
+          }
+          return {...each}
+        })
+      })
+    }
+  },[currentUser,users])
+
+  const getUserCompletedGames = useCallback((): Response => {
+    const userMail = currentUser?.email;
+    if (userMail) {
+      return {
+        status: -1,
+        message: "Found",
+        data: {
+          games: users
+            .find((each) => each.email === userMail)
+            ?.games?.filter((each) => each.isCompleted),
+        },
+      };
+    }
+    return { status: -1, message: "No user found." };
+  }, [users, currentUser]);
 
   useEffect(() => {
-    if(!currentUser){
-      navigate("/")
+    if (!currentUser) {
+      navigate("/");
     }
-  },[currentUser])
+  }, [currentUser]);
 
   return {
     getUsers,
@@ -189,6 +286,9 @@ export const useDataBase = () => {
     freezePuzzle,
     getAllFreezedPuzzle,
     updatePuzzle,
-    getUserActiveGames
+    getUserActiveGames,
+    saveGame,
+    deleteActiveGame,
+    getUserCompletedGames
   };
 };

@@ -14,6 +14,7 @@ import { Home } from "./page/home/Home";
 import { Profile } from "./page/profile/Profile";
 import styles from "./App.module.scss"
 import { GetStarted } from "./page/get-started/GetStarted";
+import { History } from "./page/history/History";
  
 export const App: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ export const App: React.FC = () => {
               <Route path="/crossword/:id" element={<Crossword />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/history" element={<History />} />
             </Routes>
           </React.Fragment>
         </Database>

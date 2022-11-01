@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from "react";
 import { useDataBase } from "../hook/useDataBase";
-import { DatabaseType, LoginForm, Puzzle } from "../utils/interface";
+import { DatabaseType, DirtyGame, LoginForm, Puzzle } from "../utils/interface";
 
 const database = createContext<DatabaseType>({
   getUsers: () => {
@@ -24,7 +24,11 @@ const database = createContext<DatabaseType>({
   freezePuzzle : (id:number) => ({status : -1,message : ""}),
   getAllFreezedPuzzle : () => ([]),
   updatePuzzle: (puzzle: Puzzle) => {},
-  getUserActiveGames : () => ({status : -1,message :''})
+  getUserActiveGames : () => ({status : -1,message :''}),
+  getUserCompletedGames : () => ({status : -1,message :''}),
+  saveGame : (game : DirtyGame) => ({status : -1,message : ''}),
+  deleteActiveGame : (id:number) => {}
+
 });
 
 export const useDatabaseContext = () => useContext(database);

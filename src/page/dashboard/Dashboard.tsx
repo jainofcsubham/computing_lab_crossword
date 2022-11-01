@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
 import { CrosswordGrid } from "../../component/crossword-grid/CrosswordGrid";
 import { ValidateLogin } from "../../component/validate-login/ValidateLogin";
 import { useDatabaseContext } from "../../context/data.service";
-import { Puzzle } from "../../utils/interface";
+import { DirtyGame, Puzzle, Puzzle_Grid } from "../../utils/interface";
 import { makeGrid } from "../../utils/util";
 import styles from "./Dashboard.module.scss";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,20 @@ import { useNavigate } from "react-router-dom";
 export const Dashboard: React.FC = () => {
   const { getAllFreezedPuzzle,getUserActiveGames } = useDatabaseContext();
   const navigate = useNavigate();
-  let activePuzzles: ReadonlyArray<Puzzle> = [];
+  const [activePuzzles,setActivePuzzles] = useState<ReadonlyArray<{
+    grid : Puzzle_Grid,
+    id : number,
+  }>>([])
+
+  useEffect(() => {
+    const temp =  getUserActiveGames()?.data?.games
+    if(temp && Array.isArray(temp)){
+      const allGames  = temp as ReadonlyArray<DirtyGame>
+      const inProgressGames = allGames.filter(each => !each.isCompleted)
+      setActivePuzzles(inProgressGames.map(each => ({grid : each.puzzle,id: each.id})))
+    }
+    
+  },[])
 
   const playGame = (id: number, type: string) => {
     navigate(`/crossword/${id}?type=${type}`);
@@ -45,7 +58,7 @@ export const Dashboard: React.FC = () => {
                           className={styles.game_heading}
                           component={"div"}
                         >
-                          {each.name}
+                          {each.grid.name}
                         </Typography>
                         <Typography
                           className={styles.play_game}
@@ -60,12 +73,13 @@ export const Dashboard: React.FC = () => {
                           <Typography
                             component={"div"}
                             style={{
-                              width: `${each.size * 40}px`,
-                              height: `${each.size * 40}px`,
+                              width: `${each.grid.size * 40}px`,
+                              height: `${each.grid.size * 40}px`,
+                              transform: `scale(${100 / (each.grid.size * 40)})`
                             }}
                             className={styles.grid_parent}
                           >
-                            <CrosswordGrid puzzle={makeGrid(each).grid} />
+                            <CrosswordGrid puzzle={each.grid} />
                           </Typography>{" "}
                         </Typography>
                       </Typography>
@@ -108,6 +122,7 @@ export const Dashboard: React.FC = () => {
                           style={{
                             width: `${each.size * 40}px`,
                             height: `${each.size * 40}px`,
+                            transform: `scale(${100 / (each.size * 40)})`
                           }}
                           className={styles.grid_parent}
                         >

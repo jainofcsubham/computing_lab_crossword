@@ -70,6 +70,7 @@ export const PuzzleList: React.FC = () => {
                     style={{
                       width: `${each.size * 40}px`,
                       height: `${each.size * 40}px`,
+                      transform: `scale(${100 / (each.size * 40)})`
                     }}
                     component={"div"}
                     className={styles.grid_parent}
