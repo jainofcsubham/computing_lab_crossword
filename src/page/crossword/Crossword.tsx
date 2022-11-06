@@ -445,7 +445,7 @@ export const Crossword: React.FC = () => {
           }}
         >
           <Typography component={'div'} className={styles.win_wrapper}>
-            <img src="/assets/win.webp" alt="win" />
+            <img src="./assets/win.webp" alt="win" />
             <Typography component={'div'}>Congratulations!! You won.</Typography>
             <Typography component={'div'}>You took {Math.floor(time/60).toString().padStart(2,'0')}:{(time%60).toString().padStart(2,'0')} minutes.</Typography>
             <Button variant="contained" className={styles.btn} onClick={() => {navigate("/dashboard")}}> Continue</Button>
