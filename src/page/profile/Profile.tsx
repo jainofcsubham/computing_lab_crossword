@@ -40,7 +40,7 @@ export const Profile: React.FC = () => {
                 <>
                   <img
                     className={styles.big_profile}
-                    src="/assets/profile.png"
+                    src="./assets/profile.png"
                     alt="big_profile"
                   />
                 </>

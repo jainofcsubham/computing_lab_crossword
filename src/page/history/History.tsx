@@ -59,7 +59,7 @@ export const History = () => {
           <>
             <Typography className={styles.empty_list} component={"div"}>
               <Typography component={"div"}>
-                <img src="../assets/empty.png" alt="empty-list" />
+                <img src="./assets/empty.png" alt="empty-list" />
               </Typography>
               <Typography className={styles.text} component={"div"}>
                 Oops!! You haven't played any games yet.

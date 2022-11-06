@@ -62,7 +62,7 @@ export const PuzzleList: React.FC = () => {
                     component={"div"}
                     className={styles.icon}
                   >
-                    <img src="../assets/settings_white.png" alt="setting" />
+                    <img src="./assets/settings_white.png" alt="setting" />
                   </Typography>
                 </Typography>
                 <Typography className={styles.wrapper} component={"div"}>

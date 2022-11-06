@@ -395,7 +395,7 @@ export const Game: React.FC<{
                           className={styles.delete}
                           component={"div"}
                         >
-                          <img src="../assets/delete.png" alt="delete" />
+                          <img src="./assets/delete.png" alt="delete" />
                         </Typography>
                       </Typography>
                     </Typography>

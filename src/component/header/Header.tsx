@@ -47,7 +47,7 @@ export const Header: React.FC = () => {
           className={styles.left}
           component={"div"}
         >
-          <img className={styles.logo} src="/assets/logo.png" alt="logo" />
+          <img className={styles.logo} src="./assets/logo.png" alt="logo" />
           <Typography className={styles.brand} component="div">
             CrossWord
           </Typography>
@@ -81,7 +81,7 @@ export const Header: React.FC = () => {
                 ) : (
                   <img
                     className={styles.profile_pic}
-                    src="/assets/profile.png"
+                    src="./assets/profile.png"
                     alt="profile"
                   />
                 )}
@@ -119,7 +119,7 @@ export const Header: React.FC = () => {
               ) : (
                 <img
                   className={styles.popover_item_img}
-                  src="/assets/profile.png"
+                  src="./assets/profile.png"
                   alt="profile"
                 />
               )}{" "}
@@ -134,7 +134,7 @@ export const Header: React.FC = () => {
                 <img
                   alt="logout"
                   className={styles.popover_item_img}
-                  src="/assets/settings.png"
+                  src="./assets/settings.png"
                 />
                 <Typography style={{ fontSize: "16px" }} component={"div"}>
                   Manage Puzzles
@@ -147,7 +147,7 @@ export const Header: React.FC = () => {
               <img
                 alt="history"
                 className={styles.popover_item_img}
-                src="/assets/history.png"
+                src="./assets/history.png"
               />
               <Typography style={{ fontSize: "16px" }} component={"div"}>
                 History
@@ -159,7 +159,7 @@ export const Header: React.FC = () => {
               <img
                 alt="logout"
                 className={styles.popover_item_img}
-                src="/assets/logout.png"
+                src="./assets/logout.png"
               />
               <Typography style={{ fontSize: "16px" }} component={"div"}>
                 Logout
