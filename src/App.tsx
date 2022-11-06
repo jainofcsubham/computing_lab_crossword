@@ -19,7 +19,7 @@ import { History } from "./page/history/History";
 export const App: React.FC = () => {
   return (
     <Typography className={styles.root} component={'div'}>
-      <Router>
+      <Router basename="/computing_lab_crossword">
         <Database>
           <React.Fragment>
             <Header />

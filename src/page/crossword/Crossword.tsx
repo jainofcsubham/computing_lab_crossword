@@ -427,15 +427,11 @@ export const Crossword: React.FC = () => {
             setOpenDialog(false);
           }}
         >
-          <DialogTitle>{"Load existing game?"}</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-slide-description">
-              This will load your "In Progress" puzzle.
-            </DialogContentText>
-          </DialogContent>
+          {/* Add some spacing */}
+          <DialogTitle>{"Would you like to?"}</DialogTitle>
           <DialogActions>
-            <Button onClick={restart}>Disagree</Button>
-            <Button onClick={resume}>Agree</Button>
+            <Button onClick={restart}>Start new</Button>
+            <Button onClick={resume}>Continue Playing</Button>
           </DialogActions>
         </Dialog>
         <Dialog
