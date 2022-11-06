@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useInterval from "use-interval";
 import { DEFAULT_USER_AND_ADMIN } from "../utils/constant";
 import {
   User,
   Response,
   LoginForm,
   Puzzle,
-  Puzzle_Grid,
   DirtyGame,
 } from "../utils/interface";
 import { PUZZLES } from "../utils/puzzle";
@@ -18,9 +18,24 @@ export const useDataBase = () => {
       ...DEFAULT_USER_AND_ADMIN,
     },
   ]);
-
   const [puzzles, setPuzzles] = useState<ReadonlyArray<Puzzle>>([...PUZZLES]);
   const [currentUser, setCurrentUser] = useState<User | undefined>();
+
+  useEffect(() => {
+    let a =localStorage.getItem("users");
+    let b =localStorage.getItem("puzzles");
+    if(a){
+      setUsers(JSON.parse(a))
+    }
+    if(b){
+      setPuzzles(JSON.parse(b));
+    }
+  },[])
+
+  useInterval(() => {
+    localStorage.setItem("users",JSON.stringify(users));
+    localStorage.setItem("puzzles",JSON.stringify(puzzles));
+  },1000)
 
   useEffect(() => {
     if (currentUser?.email) {
